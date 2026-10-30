@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'">
+<title>ClickBench 100M: four runs</title>
+<style>
+/* Same palette as the plans.html reports. Layout: one comparison table, then one card per run. */
+:root {
+  color-scheme: light;
+  --page: #f9f9f7;
+  --surface: #fcfcfb;
+  --ink: #0b0b0b;
+  --ink-2: #52514e;
+  --muted: #6f6e68;
+  --line: rgba(11, 11, 11, 0.12);
+  --accent: #1c63b8;
+  --wash: rgba(42, 120, 214, 0.08);
+  --medium: #a85a12;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+  --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --page: #161615;
+    --surface: #1e1e1c;
+    --ink: #f1f0ec;
+    --ink-2: #c2c1ba;
+    --muted: #9b9a92;
+    --line: rgba(241, 240, 236, 0.15);
+    --accent: #79b0f2;
+    --wash: rgba(121, 176, 242, 0.12);
+    --medium: #eda35a;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font: 15px/1.5 var(--font);
+}
+main {
+  display: grid;
+  gap: 32px;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 40px 20px 56px;
+}
+h1, h2, h3, p, dl, dd, ul { margin: 0; }
+h1, h2, h3 { text-wrap: balance; }
+h1 { font-size: 28px; line-height: 1.2; font-weight: 650; }
+h2 { font-size: 18px; font-weight: 650; }
+h3 { font-size: 17px; font-weight: 650; }
+a { color: var(--accent); }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+code { font: 0.92em var(--mono); }
+header { display: grid; gap: 8px; }
+.lead { max-width: 70ch; color: var(--ink-2); }
+section { display: grid; gap: 12px; }
+
+.table-wrap {
+  overflow-x: auto;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { padding: 10px 14px; text-align: right; white-space: nowrap; border-top: 1px solid var(--line); }
+thead th { border-top: 0; font-size: 13px; font-weight: 600; color: var(--muted); vertical-align: bottom; }
+th:first-child, td:first-child { text-align: left; }
+tbody th { font-weight: 600; }
+td.hot { background: var(--wash); font-weight: 600; }
+.approx { color: var(--ink-2); }
+
+.runs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 760px) { .runs { grid-template-columns: minmax(0, 1fr); } }
+.run {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 12px;
+  padding: 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.run-head { display: grid; gap: 2px; }
+.kind { font-size: 13px; color: var(--muted); }
+.facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 14px; align-content: start; font-size: 14px; font-variant-numeric: tabular-nums; }
+.facts dt { color: var(--muted); }
+.medium { color: var(--medium); font-weight: 600; }
+.links { display: flex; flex-wrap: wrap; gap: 6px 14px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 14px; }
+.links a:first-child { font-weight: 600; }
+
+.notes { display: grid; gap: 8px; max-width: 78ch; padding-left: 20px; color: var(--ink-2); font-size: 14px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>ClickBench 100M: four runs</h1>
+    <p class="lead"><code>pg_otel_probe</code> reports from October 30, 2026. Each run executed 43 queries three times on PostgreSQL 19beta3, with no errors. Container: 32 CPUs, 40 GB limit, NVMe.</p>
+  </header>
+
+  <section aria-labelledby="compare">
+    <h2 id="compare">Metrics with the probe on</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Run</th>
+            <th scope="col">Hot,<br>mean</th>
+            <th scope="col">Hot,<br>total</th>
+            <th scope="col">Cold,<br>mean</th>
+            <th scope="col">Cold,<br>total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row"><a href="gpu-parquet/plans.html">GPU on Parquet</a></th>
+            <td class="hot">18.1 ms</td><td>1.19 s</td><td>378 ms</td><td class="approx">≈26.55 s</td>
+          </tr>
+          <tr>
+            <th scope="row"><a href="gpu-mergetree/plans.html">GPU on MergeTree</a></th>
+            <td class="hot">34.9 ms</td><td>6.20 s</td><td>279 ms</td><td class="approx">≈28.62 s</td>
+          </tr>
+          <tr>
+            <th scope="row"><a href="vpcpu-parquet/plans.html">CPU on Parquet</a></th>
+            <td class="hot">157.3 ms</td><td>16.14 s</td><td class="approx">≈275 ms</td><td class="approx">≈20.65 s</td>
+          </tr>
+          <tr>
+            <th scope="row"><a href="vpcpu-mergetree/plans.html">CPU on MergeTree</a></th>
+            <td class="hot">78.2 ms</td><td>9.42 s</td><td class="approx">≈153 ms</td><td class="approx">≈13.58 s</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="runs">
+    <h2 id="runs">Reports</h2>
+    <div class="runs">
+
+      <article class="run">
+        <div class="run-head">
+          <span class="kind">GPU · Parquet · <code>gpu-parquet/</code></span>
+          <h3><a href="gpu-parquet/plans.html">GPU on Parquet</a></h3>
+        </div>
+        <p>The <code>vexec</code> executor on the GPU reads the <code>hits_pq6</code> table through <code>vexec_parquet</code>. This is the fastest hot run, but the first try costs far more than the others.</p>
+        <dl class="facts">
+          <dt>Probe on / off</dt><dd>mean 18.1 / 18.1 ms, total 1.19 / 1.20 s, cold 378 / 372 ms</dd>
+          <dt>Recorded</dt><dd>634 statements, 29.20 s, peak of 2 backends</dd>
+          <dt>Database size</dt><dd>31.6 MB</dd>
+          <dt>Findings</dt><dd><span class="medium">1 medium</span> (A25: 497 psql sessions, 2.1 % of the time), 3 low</dd>
+        </dl>
+        <div class="links">
+          <a href="gpu-parquet/plans.html">Plans</a>
+          <a href="gpu-parquet/plans.html#/traces">Traces</a>
+          <a href="gpu-parquet/plans.html#/logs">Logs</a>
+          <a href="gpu-parquet/plans.html#/metrics">Metrics</a>
+        </div>
+      </article>
+
+      <article class="run">
+        <div class="run-head">
+          <span class="kind">GPU · MergeTree · <code>gpu-mergetree/</code></span>
+          <h3><a href="gpu-mergetree/plans.html">GPU on MergeTree</a></h3>
+        </div>
+        <p>The <code>vexec</code> executor on the GPU, with the <code>hits</code> table in MergeTree. Five queries (Q34, Q33, Q27, Q28, Q20) make up 83 % of the hot total: they are the only ones still sending data to the GPU on the third try.</p>
+        <dl class="facts">
+          <dt>Probe on / off</dt><dd>mean 34.9 / 34.5 ms, total 6.20 / 6.14 s, cold 279 / 284 ms</dd>
+          <dt>Recorded</dt><dd>615 statements, 47.05 s, peak of 19 backends</dd>
+          <dt>Database size</dt><dd>60.1 GB</dd>
+          <dt>Findings</dt><dd><span class="medium">1 medium</span> (A25: 475 psql sessions, 1.4 % of the time), 2 low</dd>
+        </dl>
+        <div class="links">
+          <a href="gpu-mergetree/plans.html">Plans</a>
+          <a href="gpu-mergetree/plans.html#/traces">Traces</a>
+          <a href="gpu-mergetree/plans.html#/logs">Logs</a>
+          <a href="gpu-mergetree/plans.html#/metrics">Metrics</a>
+        </div>
+      </article>
+
+      <article class="run">
+        <div class="run-head">
+          <span class="kind">CPU · Parquet · <code>vpcpu-parquet/</code></span>
+          <h3><a href="vpcpu-parquet/plans.html">CPU on Parquet</a></h3>
+        </div>
+        <p>Runs on the CPU through <code>vp_cpu</code>, with <code>vexec_parquet</code> storage and the <code>hits_pq6</code> table. Faster than ClickHouse on 35 of 43 queries, with correct answers.</p>
+        <dl class="facts">
+          <dt>VP7, no probe</dt><dd>mean 158.4 ms, total 16.23 s</dd>
+          <dt>ClickHouse</dt><dd>mean 229.1 ms, total 21.23 s (VP7's run)</dd>
+          <dt>Recorded</dt><dd>137 statements, 53.27 s, peak of 34 backends</dd>
+          <dt>Database size</dt><dd>31.6 MB</dd>
+          <dt>Findings</dt><dd>3 low</dd>
+        </dl>
+        <div class="links">
+          <a href="vpcpu-parquet/plans.html">Plans</a>
+          <a href="vpcpu-parquet/plans.html#/traces">Traces</a>
+          <a href="vpcpu-parquet/plans.html#/logs">Logs</a>
+          <a href="vpcpu-parquet/plans.html#/metrics">Metrics</a>
+        </div>
+      </article>
+
+      <article class="run">
+        <div class="run-head">
+          <span class="kind">CPU · MergeTree · <code>vpcpu-mergetree/</code></span>
+          <h3><a href="vpcpu-mergetree/plans.html">CPU on MergeTree</a></h3>
+        </div>
+        <p>Runs on the CPU through <code>vp_cpu</code>, with the <code>hits</code> table in MergeTree. Faster than ClickHouse on 11 of 43 queries, with correct answers.</p>
+        <dl class="facts">
+          <dt>VP7, no probe</dt><dd>mean 79.1 ms, total 9.14 s</dd>
+          <dt>ClickHouse</dt><dd>mean 67.4 ms, total 7.99 s (VP7's run)</dd>
+          <dt>Recorded</dt><dd>140 statements, 32.95 s, peak of 35 backends</dd>
+          <dt>Database size</dt><dd>60.1 GB</dd>
+          <dt>Findings</dt><dd>2 low</dd>
+        </dl>
+        <div class="links">
+          <a href="vpcpu-mergetree/plans.html">Plans</a>
+          <a href="vpcpu-mergetree/plans.html#/traces">Traces</a>
+          <a href="vpcpu-mergetree/plans.html#/logs">Logs</a>
+          <a href="vpcpu-mergetree/plans.html#/metrics">Metrics</a>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <section aria-labelledby="reading">
+    <h2 id="reading">How to read the numbers</h2>
+    <ul class="notes">
+      <li><strong>Hot</strong> is the best of the three tries and <strong>cold</strong> is the first. Totals of the best tries, recomputed from the traces, differ from the table by less than 2 %.</li>
+      <li><strong>Mean</strong> is not the total divided by 43. The values match a geometric mean shifted by 10 ms, so long queries affect it less than they affect the total. This formula was derived from the traces and does not appear in the original run summaries.</li>
+      <li><strong>≈</strong> marks values computed from the report's traces because the run summaries don't include them. Trace times run slightly below what the client measured.</li>
+      <li><strong>Recorded</strong> covers everything the probe saw: all tries and housekeeping statements. It is not a benchmark result, so don't compare runs on it.</li>
+      <li><strong>Probe cost.</strong> For GPU, each variant was compared over a single pass, with the probe collecting metrics every second (the default is 15 s) and full query text. For CPU, the baseline is VP7's run without the probe, and the difference is too small to measure.</li>
+      <li><strong>Gaps in the data.</strong> All four reports lack read timing and checkpoint logs, so rules A18 and A28 are incomplete. The advisor asks for <code>track_io_timing</code> and <code>log_checkpoints</code> to be turned on.</li>
+    </ul>
+  </section>
+</main>
+</body>
+</html>
